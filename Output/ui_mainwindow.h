@@ -115,7 +115,7 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0));
-        readDataBtn->setText(QApplication::translate("MainWindow", "Read", 0));
+        readDataBtn->setText(QApplication::translate("MainWindow", "\350\256\200\345\217\226MPU6050\346\225\270\346\223\232", 0));
         move_btn->setText(QApplication::translate("MainWindow", "move", 0));
         Quit->setText(QApplication::translate("MainWindow", "Quit", 0));
     } // retranslateUi

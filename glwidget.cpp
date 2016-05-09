@@ -4,12 +4,24 @@
 #include "math.h"
 #include <iostream>
 
+static float cos_theta[361];
+static float sin_theta[361];
+void init_sin_cos_theta(){
+    for(int i=0 ; i<=360 ; i++){
+        sin_theta[i] = sin(i * 0.017453292);
+        cos_theta[i] = cos(i * 0.017453292);
+    }
+}
+
 glwidget::glwidget(QWidget *parent) :
     QGLWidget(parent)
 {
     connect(&timer, SIGNAL(timeout()), this, SLOT(updateGL()));
-    timer.start(16);
-    origin_z = Vector3f(0, 0, 1);
+    timer.start(10);
+    //原本指向的地方很重要, 因為angle轉到180的地方會翻面, 不好看
+    origin_z = Vector3f(0       , 0        , 1);
+    new_z    = Vector3f(0.202657, -0.376243, 0.903948);
+    init_sin_cos_theta();
 }
 
 void glwidget::initializeGL()
@@ -50,6 +62,74 @@ Vector3f& NormalizeVector(Vector3f& v)
 
     return v;
 }
+void draw_XZ_circle(float r, float bx, float by, float bz){
+    float x, y;
+    float nx, ny;
+    nx = cos_theta[0] * r;
+    ny = sin_theta[0] * r;
+    for(int i=0 ; i<360 ; i++){
+        x = nx;
+        y = ny;
+        nx = cos_theta[i+1] * r;
+        ny = sin_theta[i+1] * r;
+        glColor3f(0, 0, 1.0);
+        glVertex3f(bx+0.0f, by+0.0f, bz+0.0f);
+        glColor3f(1.0f,1.0f,1.0f);
+        glVertex3f(bx+x, by, bz+y);
+        glColor3f(1.0f,1.0f,1.0f);
+        glVertex3f(bx+nx, by, bz+ny);
+    }
+}
+void draw_XY_circle(float r, float bx, float by, float bz){
+    float x, y;
+    float nx, ny;
+    nx = cos_theta[0] * r;
+    ny = sin_theta[0] * r;
+    for(int i=0 ; i<360 ; i++){
+        x = nx;
+        y = ny;
+        nx = cos_theta[i+1] * r;
+        ny = sin_theta[i+1] * r;
+        //glColor3f(1.0f,1.0f,1.0f);
+        glVertex3f(bx+0.0f, by+0.0f, bz+0.0f);
+        //glColor3f(1.0f,1.0f,1.0f);
+        glVertex3f(bx+x, by+y, bz);
+        //glColor3f(1.0f,1.0f,1.0f);
+        glVertex3f(bx+nx, by+ny, bz);
+    }
+}
+void connect_two_XY_circles(float r1, float bx1, float by1, float bz1,
+                      float r2, float bx2, float by2, float bz2){
+    float x1, y1, x2, y2;
+    float nx1, ny1, nx2, ny2;
+    nx1 = cos_theta[0] * r1;
+    ny1 = sin_theta[0] * r1;
+    nx2 = cos_theta[0] * r2;
+    ny2 = sin_theta[0] * r2;
+    for(int i=0 ; i<360 ; i++){
+        x1 = nx1;
+        y1 = ny1;
+        x2 = nx2;
+        y2 = ny2;
+        nx1 = cos_theta[i+1] * r1;
+        ny1 = sin_theta[i+1] * r1;
+        nx2 = cos_theta[i+1] * r2;
+        ny2 = sin_theta[i+1] * r2;
+        //glColor3f(1.0f,0.0f,0.0f);
+        glVertex3f(bx1+x1, by1+y1, bz1);
+        //glColor3f(1.0f,0.0f,0.0f);
+        glVertex3f(bx2+x2, by2+y2, bz2);
+        //glColor3f(1.0f,0.0f,0.0f);
+        glVertex3f(bx2+nx2, by2+ny2, bz2);
+        //glColor3f(1.0f,0.0f,0.0f);
+        glVertex3f(bx2+nx2, by2+ny2, bz2);
+        //glColor3f(1.0f,0.0f,0.0f);
+        glVertex3f(bx1+nx1, by1+ny1, bz1);
+        //glColor3f(1.0f,0.0f,0.0f);
+        glVertex3f(bx1+x1, by1+y1, bz1);
+    }
+}
+
 void glwidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -59,9 +139,9 @@ void glwidget::paintGL()
     //origin_z.y = 0;
     //origin_z.z = -1;
     //new z
-    //new_z.x    = -0.7071;
-    //new_z.y    =  0     ;
-    //new_z.z    = -0.7071;
+    //new_z.x    =  0.202657;
+    //new_z.y    = -0.376243;
+    //new_z.z    =  0.903948;
     std::cout << "new_z: " << new_z.x << " , " << new_z.y << " , " << new_z.z << ")" << std::endl;
     //外積結果
     origin_z = NormalizeVector(origin_z);
@@ -73,16 +153,32 @@ void glwidget::paintGL()
     std::cout << "rotate_angle: " << rotate_angle << std::endl;
 
     glLoadIdentity();
-    gluLookAt(-1, -5, 0, 0, 0, 0, 0, 0, 1);
+    gluLookAt(0, -10, 0, 0, 0, 0, 0, 0, 1);
     //glTranslatef(0.0, 0.1, -1.0);
     glRotatef(rotate_angle, rotate_axis.x, rotate_axis.y ,rotate_axis.z);
     glBegin(GL_TRIANGLES);
-        glColor3f(1.0, 0, 0);
+        /*glColor3f(1.0, 0, 0);
         glVertex3f(-0.5, 0, 0 );
         glColor3f(0, 1.0, 0);
         glVertex3f( 0.5, 0, 0 );
         glColor3f(0, 0, 1.0);
-        glVertex3f( origin_z.x, origin_z.y, origin_z.z);
+        glVertex3f( origin_z.x, origin_z.y, origin_z.z);*/
+        //握把
+        glColor3f(0, 1.0, 0);
+        draw_XY_circle (0.1, 0, 0, 0);
+        connect_two_XY_circles(0.1, 0, 0, 0, 0.1, 0, 0, 1);
+        draw_XY_circle (0.1, 0, 0, 1);
+        //連接握把與中軸
+        glColor3f(0, 0, 1.0);
+        connect_two_XY_circles(0.1 , 0, 0, 1  , 0.05, 0, 0, 1.2);
+        //中軸
+        glColor3f(1.0, 1.0, 1.0);
+        draw_XY_circle (0.05, 0, 0, 1.2);
+        connect_two_XY_circles(0.05, 0, 0, 1.2, 0.05, 0, 0, 2.4);
+        draw_XY_circle (0.05, 0, 0, 2.4);
+        //拍面
+        glColor3f(1.0, 1.0, 1.0);
+        draw_XZ_circle(0.6, 0, 0, 3);
     glEnd();
 }
 

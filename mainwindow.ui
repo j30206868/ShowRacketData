@@ -75,7 +75,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Read</string>
+         <string>讀取MPU6050數據</string>
         </property>
        </widget>
       </item>

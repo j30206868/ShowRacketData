@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mpuReader->setGlWidget(ui->widget);
     isReadingMPU6050 = false;
     //mpuReader->setNextSymCount(nextSampleCount);
-    toggleMPU6050Reading();
+    //toggleMPU6050Reading();
 }
 
 MainWindow::~MainWindow()
@@ -29,6 +29,7 @@ void MainWindow::toggleMPU6050Reading(){
     this->style()->polish(this);
     this->update();
     if(isReadingMPU6050){
+        //ui->readDataBtn->setText(tr("連接藍芽中..."));
         mpuReader->startReading();
         ui->readDataBtn->setText(tr("停止讀取"));
         ui->readDataBtn->setFixedWidth(100);
