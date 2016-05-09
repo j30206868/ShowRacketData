@@ -1,0 +1,12 @@
+INPUT(
+./debug\main.o
+./debug\mainwindow.o
+./debug\glwidget.o
+./debug\commonfunc.o
+./debug\cwz_win_classic_bluetooth.o
+./debug\mpu6050reader.o
+./debug\serialclass.o
+./debug\moc_mainwindow.o
+./debug\moc_glwidget.o
+./debug\moc_mpu6050reader.o
+);

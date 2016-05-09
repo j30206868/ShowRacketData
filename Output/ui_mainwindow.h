@@ -32,7 +32,8 @@ public:
     glwidget *widget;
     QVBoxLayout *verticalLayout;
     QSpacerItem *verticalSpacer;
-    QPushButton *pushButton_2;
+    QPushButton *readDataBtn;
+    QPushButton *move_btn;
     QPushButton *Quit;
 
     void setupUi(QMainWindow *MainWindow)
@@ -71,13 +72,19 @@ public:
 
         verticalLayout->addItem(verticalSpacer);
 
-        pushButton_2 = new QPushButton(centralWidget);
-        pushButton_2->setObjectName(QStringLiteral("pushButton_2"));
+        readDataBtn = new QPushButton(centralWidget);
+        readDataBtn->setObjectName(QStringLiteral("readDataBtn"));
         QFont font;
         font.setPointSize(12);
-        pushButton_2->setFont(font);
+        readDataBtn->setFont(font);
 
-        verticalLayout->addWidget(pushButton_2);
+        verticalLayout->addWidget(readDataBtn);
+
+        move_btn = new QPushButton(centralWidget);
+        move_btn->setObjectName(QStringLiteral("move_btn"));
+        move_btn->setFont(font);
+
+        verticalLayout->addWidget(move_btn);
 
         Quit = new QPushButton(centralWidget);
         Quit->setObjectName(QStringLiteral("Quit"));
@@ -108,8 +115,9 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0));
-        pushButton_2->setText(QApplication::translate("MainWindow", "move", 0));
-        Quit->setText(QApplication::translate("MainWindow", "PushButton", 0));
+        readDataBtn->setText(QApplication::translate("MainWindow", "Read", 0));
+        move_btn->setText(QApplication::translate("MainWindow", "move", 0));
+        Quit->setText(QApplication::translate("MainWindow", "Quit", 0));
     } // retranslateUi
 
 };

@@ -7,9 +7,9 @@
 glwidget::glwidget(QWidget *parent) :
     QGLWidget(parent)
 {
-    //connect(&timer, SIGNAL(timeout()), this, SLOT(updateGL()));
-    //timer.start(16);
-    origin_z = Vector3f(0, 0, -1);
+    connect(&timer, SIGNAL(timeout()), this, SLOT(updateGL()));
+    timer.start(16);
+    origin_z = Vector3f(0, 0, 1);
 }
 
 void glwidget::initializeGL()
@@ -59,9 +59,10 @@ void glwidget::paintGL()
     //origin_z.y = 0;
     //origin_z.z = -1;
     //new z
-    new_z.x    = -0.7071;
-    new_z.y    =  0     ;
-    new_z.z    = -0.7071;
+    //new_z.x    = -0.7071;
+    //new_z.y    =  0     ;
+    //new_z.z    = -0.7071;
+    std::cout << "new_z: " << new_z.x << " , " << new_z.y << " , " << new_z.z << ")" << std::endl;
     //外積結果
     origin_z = NormalizeVector(origin_z);
     new_z    = NormalizeVector(new_z);
@@ -72,11 +73,11 @@ void glwidget::paintGL()
     std::cout << "rotate_angle: " << rotate_angle << std::endl;
 
     glLoadIdentity();
-    gluLookAt(0, -5, 0, 0, 0, 0, 0, 0, 1);
+    gluLookAt(-1, -5, 0, 0, 0, 0, 0, 0, 1);
     //glTranslatef(0.0, 0.1, -1.0);
     glRotatef(rotate_angle, rotate_axis.x, rotate_axis.y ,rotate_axis.z);
     glBegin(GL_TRIANGLES);
-        glColor3f(0, 1.0, 0);
+        glColor3f(1.0, 0, 0);
         glVertex3f(-0.5, 0, 0 );
         glColor3f(0, 1.0, 0);
         glVertex3f( 0.5, 0, 0 );
@@ -94,6 +95,13 @@ void glwidget::resizeGL(int w, int h)
     glMatrixMode(GL_MODELVIEW);
     //glLoadIdentity();
     //gluLookAt(0, 0, 20, 0, 0, 0, 0, 1, 0);
+}
+
+void glwidget::setNewZ(float x, float y, float z)
+{
+    this->new_z.x = x;
+    this->new_z.y = y;
+    this->new_z.z = z;
 }
 
 void glwidget::mousePressEvent(QMouseEvent *event){

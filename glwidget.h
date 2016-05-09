@@ -18,6 +18,8 @@ public:
     void initializeGL();
     void paintGL();
     void resizeGL(int w, int h);
+
+    void setNewZ(float x, float y, float z);
 signals:
 
 public slots:

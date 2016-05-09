@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "mpu6050reader.h"
 
 namespace Ui {
 class MainWindow;
@@ -16,10 +17,13 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButton_2_clicked();
+    void on_move_btn_clicked();
+    void toggleMPU6050Reading();
 
 private:
     Ui::MainWindow *ui;
+    bool isReadingMPU6050;
+    MpuReader *mpuReader;
 };
 
 #endif // MAINWINDOW_H

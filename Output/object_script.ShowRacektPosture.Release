@@ -1,0 +1,12 @@
+INPUT(
+./release\main.o
+./release\mainwindow.o
+./release\glwidget.o
+./release\commonfunc.o
+./release\cwz_win_classic_bluetooth.o
+./release\mpu6050reader.o
+./release\serialclass.o
+./release\moc_mainwindow.o
+./release\moc_glwidget.o
+./release\moc_mpu6050reader.o
+);
