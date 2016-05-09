@@ -142,7 +142,7 @@ void glwidget::paintGL()
     //new_z.x    =  0.202657;
     //new_z.y    = -0.376243;
     //new_z.z    =  0.903948;
-    std::cout << "new_z: " << new_z.x << " , " << new_z.y << " , " << new_z.z << ")" << std::endl;
+
     //外積結果
     origin_z = NormalizeVector(origin_z);
     new_z    = NormalizeVector(new_z);
@@ -150,11 +150,12 @@ void glwidget::paintGL()
 
     rotate_angle = acos(DotProduct(origin_z, new_z) / (VectorMagnitude(origin_z) * VectorMagnitude(new_z)) );
     rotate_angle = RadianToDegree(rotate_angle);
+
+    std::cout << "new_z: " << new_z.x << " , " << new_z.y << " , " << new_z.z << ")" << std::endl;
     std::cout << "rotate_angle: " << rotate_angle << std::endl;
 
     glLoadIdentity();
     gluLookAt(0, -10, 0, 0, 0, 0, 0, 0, 1);
-    //glTranslatef(0.0, 0.1, -1.0);
     glRotatef(rotate_angle, rotate_axis.x, rotate_axis.y ,rotate_axis.z);
     glBegin(GL_TRIANGLES);
         /*glColor3f(1.0, 0, 0);
@@ -163,6 +164,13 @@ void glwidget::paintGL()
         glVertex3f( 0.5, 0, 0 );
         glColor3f(0, 0, 1.0);
         glVertex3f( origin_z.x, origin_z.y, origin_z.z);*/
+        //Sensor部分
+        glColor3f(1.0, 0, 0);
+        connect_two_XY_circles(0.01, -0.05, 0, -0.15, 0.01, -0.05, 0, 0);
+        glColor3f(0, 0, 0);
+        connect_two_XY_circles(0.01, -0.04, 0, -0.15, 0.01, -0.04, 0, 0);
+        glColor3f(0.3, 0, 0.3);
+        connect_two_XY_circles(0.01, -0.03, 0, -0.15, 0.01, -0.03, 0, 0);
         //握把
         glColor3f(0, 1.0, 0);
         draw_XY_circle (0.1, 0, 0, 0);
