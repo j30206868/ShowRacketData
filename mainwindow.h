@@ -17,8 +17,15 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_move_btn_clicked();
     void toggleMPU6050Reading();
+
+    void on_record_btn_clicked();
+
+    void on_type_box_currentIndexChanged(int index);
+
+    void on_person_text_edit_textChanged();
+
+    void on_file_count_text_edit_textChanged();
 
 private:
     Ui::MainWindow *ui;

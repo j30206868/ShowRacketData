@@ -151,8 +151,8 @@ void glwidget::paintGL()
     rotate_angle = acos(DotProduct(origin_z, new_z) / (VectorMagnitude(origin_z) * VectorMagnitude(new_z)) );
     rotate_angle = RadianToDegree(rotate_angle);
 
-    std::cout << "new_z: " << new_z.x << " , " << new_z.y << " , " << new_z.z << ")" << std::endl;
-    std::cout << "rotate_angle: " << rotate_angle << std::endl;
+    //std::cout << "new_z: " << new_z.x << " , " << new_z.y << " , " << new_z.z << ")" << std::endl;
+    //std::cout << "rotate_angle: " << rotate_angle << std::endl;
 
     glLoadIdentity();
     gluLookAt(0, -10, 0, 0, 0, 0, 0, 0, 1);

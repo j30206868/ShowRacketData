@@ -24,6 +24,8 @@ int agMedianFilter(int *Accls[3], int *Gyros[3], int *accl, int *gyro, int &MFCo
 void waitUntilSerialStable(Serial* SP, char *incomingData, int dataLength);
 int readSerialIntoBuffer(Serial* SP, char *incomingData, int &dataLength, int &readResult, int &bLen, int bSize, char *buffer);
 
+void writeAcclAndGyroAndGravity(const char *fname, int *accl, int *gyro, float *gravity, int isDownKeyPressed);
+void writeMpu6050RawToFile(const char *fname, int *accl, int *gyro, float *quaternion, int period, int isDownKeyPressed);
 
 class MpuReader : public QThread
 {
@@ -33,13 +35,24 @@ public:
     MpuReader(QObject *parent = 0);
     ~MpuReader();
 
-    void setSymSaveDir(QString dirPath);
-    void setNextSymCount(int nextCount);
     void stopReading();
     void startReading();
     bool isReading();
 
     void setGlWidget(glwidget *widg);
+    void setWriteRawToFile(bool value);
+
+    bool getWriteRawToFile() const;
+
+    int getRacket_file_count() const;
+    void setRacket_file_count(int value);
+
+    std::string getPerson_string() const;
+    void setPerson_string(std::string value);
+
+    std::string getType_string() const;
+    void setType_string(std::string value);
+
 signals:
     void updateNewSymbol();//return值 是從main那邊取得下一個檔案的編號
     void readingEnded();
@@ -54,11 +67,13 @@ private:
 
     //private變數
     bool stop;
-    int nextSymCount;
-    QString symDirPath;
 
     glwidget *my_glwidget;
 
+    std::string type_string;
+    std::string person_string;
+    int racket_file_count;
+    bool writeRawToFile;
 };
 
 #endif // COMPORTREADER_H

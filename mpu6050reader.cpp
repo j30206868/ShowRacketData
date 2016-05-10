@@ -12,19 +12,16 @@
 //#define USE_WIRE_CONNECTION
 static const char *racketFilePath = "Racket/";
 static std::string date_string = "";
-static const char *type_string = "5";
-static const char *person_string = "wu";
+//static const char *type_string = "5";
+//static const char *person_string = "wu";
+//static int racket_file_count = 2;
 static std::stringstream fileNameSStream;
-static int racket_file_count = 2;
 ///
 
 MpuReader::MpuReader(QObject *parent)
 : QThread(parent)
 {
     stop = true;
-    symDirPath = "";
-    setNextSymCount(0);
-
     //get current date
     time_t t = time(0);   // get time now
     struct tm * now = localtime( & t );
@@ -35,6 +32,10 @@ MpuReader::MpuReader(QObject *parent)
         datesstm << (now->tm_mon + 1);
     datesstm <<  now->tm_mday;
     date_string = datesstm.str();
+
+    racket_file_count = 1;
+
+    writeRawToFile = false;
 }
 
 MpuReader::~MpuReader()
@@ -42,15 +43,6 @@ MpuReader::~MpuReader()
     stop = true;
     wait();//使執行緒在Stop被改為true時 會等到run那邊的迴圈結束才把執行緒destory掉
            //避免不可預期之錯誤發生
-}
-
-void writeAcclAndGyroAndGravity(const char *fname, int *accl, int *gyro, float *gravity, int isDownKeyPressed){
-    std::ofstream myfile (fname, std::ios::app);
-    myfile << accl[0] << "," << accl[1] << "," << accl[2] << ",";
-    myfile << gyro[0] << "," << gyro[1] << "," << gyro[2] << ",";
-    myfile << gravity[0] << "," << gravity[1] << "," << gravity[2] <<",";
-    myfile << isDownKeyPressed << "\n";
-    myfile.close();
 }
 
 void MpuReader::setGlWidget(glwidget *widg){
@@ -89,8 +81,7 @@ void MpuReader::run()
     //Symbol record
     //SymbolRecorder SR = SymbolRecorder();
 
-    int ctrl_key_state = 0;
-    fileNameSStream << racketFilePath << date_string << "_" << type_string << "_" << person_string << "_" << racket_file_count << ".txt";
+    //fileNameSStream << racketFilePath << date_string << "_" << type_string << "_" << person_string << "_" << racket_file_count << ".txt";
 
     //********************************************************//
     //					連接Com port並確認連線
@@ -137,6 +128,23 @@ void MpuReader::run()
         if( flag != GETAANDG_NEW_VALID_DATA )
             continue;//尚未讀到整組完整資料 不處理 繼續讀
 
+        SHORT downKeyState = GetAsyncKeyState( VK_DOWN );
+        std::cout << "gravity: " << gravity[0] << ", " << gravity[1] << ", " << gravity[2] << std::endl;
+        if( writeRawToFile )
+        {//按ctrl鍵
+            std::cout << "period: " << period << std::endl;
+
+            if( ( 1 << 16 ) & downKeyState ){
+                //writeAcclAndGyroAndGravity(fileNameSStream.str().c_str(), accl, gyro, gravity, 1);
+                writeMpu6050RawToFile(fileNameSStream.str().c_str(), accl, gyro, quatern, period, 1);
+                //std::cout << "Down Key State: " << 1 << std::endl;
+            }else{
+                //writeAcclAndGyroAndGravity(fileNameSStream.str().c_str(), accl, gyro, gravity, 0);
+                writeMpu6050RawToFile(fileNameSStream.str().c_str(), accl, gyro, quatern, period, 0);
+                //std::cout << "Down Key State: " << 0 << std::endl;
+            }
+        }
+
         //********************************************************//
         //				處理加速度計與陀螺儀Raw Data
         //********************************************************//
@@ -149,53 +157,6 @@ void MpuReader::run()
         double total_q = sqrt(gravity[0]*gravity[0] + gravity[1]*gravity[1] + gravity[2]*gravity[2]);
 
         this->my_glwidget->setNewZ(gravity[0], gravity[1], gravity[2]);
-
-        SHORT ctrlKeyState = GetAsyncKeyState( VK_CONTROL );
-        SHORT downKeyState = GetAsyncKeyState( VK_DOWN );
-
-        if( ( 1 << 16 ) & ctrlKeyState ){
-            if(ctrl_key_state == 0)
-            {//剛按下去第一筆
-                fileNameSStream.str("");
-                fileNameSStream << racketFilePath << date_string << "_" << type_string << "_" << person_string << "_" << racket_file_count << ".txt";
-                cleanFile(fileNameSStream.str());
-                std::cout << std::endl << std::endl << std::endl << std::endl << std::endl;
-                std::cout << std::endl << std::endl << std::endl << std::endl << std::endl;
-                std::cout << "====> Start New File: " << fileNameSStream.str() << std::endl;
-                std::cout << std::endl << std::endl << std::endl << std::endl << std::endl;
-                std::cout << std::endl << std::endl << std::endl << std::endl << std::endl;
-            }
-
-            ctrl_key_state = 1;
-
-        }else{
-            if(ctrl_key_state == 1)
-            {//剛放開第一筆
-                racket_file_count++;
-            }
-
-            ctrl_key_state = 0;
-        }
-
-
-        //ctrl
-        if( ( 1 << 16 ) & ctrlKeyState )
-        {//按ctrl鍵
-            //std::cout << "quatern: " << quatern[0] << "," << quatern[1] << "," << quatern[2] << "," << quatern[3] << std::endl;
-            //std::cout << "accl: " << accl[0] << "," << accl[1] << "," << accl[2] << std::endl;
-            //std::cout << "gyro: " << gyro[0] << "," << gyro[1] << "," << gyro[2] << std::endl;
-            //std::cout << "gravity: " << gravity[0] << "," << gravity[1] << "," << gravity[2] << std::endl;
-            //std::cout << "total_q: " << total_q << std::endl;
-            std::cout << "period: " << period << std::endl;
-
-            if( ( 1 << 16 ) & downKeyState ){
-                writeAcclAndGyroAndGravity(fileNameSStream.str().c_str(), accl, gyro, gravity, 1);
-                //std::cout << "Down Key State: " << 1 << std::endl;
-            }else{
-                writeAcclAndGyroAndGravity(fileNameSStream.str().c_str(), accl, gyro, gravity, 0);
-                //std::cout << "Down Key State: " << 0 << std::endl;
-            }
-        }
 
         //check if gravity value is invalid
         if( total_q >= 1.1 ){
@@ -211,18 +172,6 @@ void MpuReader::run()
 
         //Median Filter(中位值濾波)
         agMedianFilter(Accls, Gyros, accl, gyro, MFCount, MFLen, true, true); //是否做濾波 accl=true gyro=true
-
-        //********************************************************//
-        //						記錄Symbol
-        //********************************************************//
-        //單純紀錄Gyro的raw data(當然因為前面有中位值濾波 所以不是完全的raw data)
-        std::stringstream sstm;
-        sstm << symDirPath.toStdString() << nextSymCount << ".txt";
-
-        //buttons[0] = false;
-        //buttons[1] = false;
-
-        //int toggleFlag = SR.recGyroSymInSeqNum( buttons[0] | buttons[1] , sstm.str(), gyro);
     }
 #ifdef USE_WIRE_CONNECTION
     SP->~Serial();
@@ -233,6 +182,59 @@ void MpuReader::run()
     freeIntDArray(Accls, MFLen);
     freeIntDArray(Gyros, MFLen);
 }
+std::string MpuReader::getType_string() const
+{
+    return type_string;
+}
+
+void MpuReader::setType_string(std::string value)
+{
+    type_string = value;
+}
+
+std::string MpuReader::getPerson_string() const
+{
+    return person_string;
+}
+
+void MpuReader::setPerson_string(std::string value)
+{
+    person_string = value;
+}
+
+int MpuReader::getRacket_file_count() const
+{
+    return racket_file_count;
+}
+
+void MpuReader::setRacket_file_count(int value)
+{
+    racket_file_count = value;
+}
+
+bool MpuReader::getWriteRawToFile() const
+{
+    return writeRawToFile;
+}
+
+void MpuReader::setWriteRawToFile(bool value)
+{
+    if(value){
+        fileNameSStream.str("");
+        fileNameSStream << racketFilePath << date_string << "_" << type_string << "_" << person_string << "_" << racket_file_count << ".txt";
+        cleanFile(fileNameSStream.str());
+        std::cout << std::endl << std::endl << std::endl << std::endl << std::endl;
+        std::cout << std::endl << std::endl << std::endl << std::endl << std::endl;
+        std::cout << "====> Start New File: " << fileNameSStream.str() << std::endl;
+        std::cout << std::endl << std::endl << std::endl << std::endl << std::endl;
+        std::cout << std::endl << std::endl << std::endl << std::endl << std::endl;
+    }else{
+        racket_file_count++;
+    }
+
+    writeRawToFile = value;
+}
+
 
 void MpuReader::stopReading(){
     stop = true;
@@ -253,14 +255,6 @@ bool MpuReader::isReading(){
     }
 }
 
-void MpuReader::setSymSaveDir(QString dirPath){
-    symDirPath = dirPath;
-    std::cout << "symDirPath updated: " << symDirPath.toLocal8Bit().data() << std::endl;
-}
-void MpuReader::setNextSymCount(int nextCount){
-    nextSymCount = nextCount;
-    std::cout << "nextSymCount updated: " << nextSymCount << std::endl;
-}
 
 //********************************************************//
 //														  //
@@ -645,4 +639,23 @@ int readSerialIntoBuffer(Serial* SP, char *incomingData, int &dataLength, int &r
     }else{
         return 0; // result = -1 no data read
     }
+}
+
+void writeAcclAndGyroAndGravity(const char *fname, int *accl, int *gyro, float *gravity, int isDownKeyPressed){
+    std::ofstream myfile (fname, std::ios::app);
+    myfile << accl[0] << "," << accl[1] << "," << accl[2] << ",";
+    myfile << gyro[0] << "," << gyro[1] << "," << gyro[2] << ",";
+    myfile << gravity[0] << "," << gravity[1] << "," << gravity[2] <<",";
+    myfile << isDownKeyPressed << "\n";
+    myfile.close();
+}
+
+void writeMpu6050RawToFile(const char *fname, int *accl, int *gyro, float *quaternion, int period, int isDownKeyPressed){
+    std::ofstream myfile (fname, std::ios::app);
+    myfile << accl[0] << "," << accl[1] << "," << accl[2] << ",";
+    myfile << gyro[0] << "," << gyro[1] << "," << gyro[2] << ",";
+    myfile << quaternion[0] << "," << quaternion[1] << "," << quaternion[2] <<"," << quaternion[3] << ",";
+    myfile << period << ",";
+    myfile << isDownKeyPressed << "\n";
+    myfile.close();
 }
