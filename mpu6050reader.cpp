@@ -49,6 +49,8 @@ void MpuReader::setGlWidget(glwidget *widg){
     this->my_glwidget = widg;
 }
 
+Vector3f v    = Vector3f(0,0,0);
+Vector3f disp = Vector3f(0,0,0);
 void MpuReader::run()
 {
     //連線藍芽
@@ -162,10 +164,21 @@ void MpuReader::run()
         //去重力
         removeGravity(accl, gravity);
 
-        double total_q = sqrt(gravity[0]*gravity[0] + gravity[1]*gravity[1] + gravity[2]*gravity[2]);
+        v.x = (float)accl[0] / 327680 * period;
+        v.y = (float)accl[1] / 327680 * period;
+        v.z = (float)accl[2] / 327680 * period;
+
+        disp += v;
 
         this->my_glwidget->setNewZ(gravity[0], gravity[1], gravity[2]);
+        this->my_glwidget->setDisplace(disp);
 
+        SHORT spaceKeyState = GetAsyncKeyState(VK_SPACE);
+        if( ( 1 << 16 ) & spaceKeyState){
+            disp = Vector3f(0,0,0);
+        }
+
+        double total_q = sqrt(gravity[0]*gravity[0] + gravity[1]*gravity[1] + gravity[2]*gravity[2]);
         //check if gravity value is invalid
         if( total_q >= 1.1 ){
             std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
