@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "mpu6050reader.h"
+#include "racketdataanalyzer.h"
 
 namespace Ui {
 class MainWindow;
@@ -18,6 +19,10 @@ public:
 
 private slots:
     void toggleMPU6050Reading();
+    void mpu6050StartReading();
+    void mpu6050StopReading();
+
+    void changeCurrentBadData(BadData *data);
 
     void on_record_btn_clicked();
 
@@ -26,11 +31,13 @@ private slots:
     void on_person_text_edit_textChanged();
 
     void on_file_count_text_edit_textChanged();
+    void on_read_file_btn_clicked();
 
 private:
     Ui::MainWindow *ui;
-    bool isReadingMPU6050;
     MpuReader *mpuReader;
+    RacketDataAnalyzer *rdAnalyzer;
+    BadData *curBadData;
 };
 
 #endif // MAINWINDOW_H

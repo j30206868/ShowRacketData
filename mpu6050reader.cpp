@@ -21,7 +21,7 @@ static std::stringstream fileNameSStream;
 MpuReader::MpuReader(QObject *parent)
 : QThread(parent)
 {
-    stop = true;
+    stopFlag = true;
     //get current date
     time_t t = time(0);   // get time now
     struct tm * now = localtime( & t );
@@ -40,7 +40,7 @@ MpuReader::MpuReader(QObject *parent)
 
 MpuReader::~MpuReader()
 {
-    stop = true;
+    stopFlag = true;
     wait();//使執行緒在Stop被改為true時 會等到run那邊的迴圈結束才把執行緒destory掉
            //避免不可預期之錯誤發生
 }
@@ -51,6 +51,14 @@ void MpuReader::setGlWidget(glwidget *widg){
 
 void MpuReader::run()
 {
+    //連線藍芽
+    #ifndef USE_WIRE_CONNECTION
+        blue_connector = new cwz_c_blue();
+        int result = blue_connector->connect(this->stopFlag);
+        if(result == 1)//如果成功連線
+            emit connectionCreated();
+    #endif
+
     //********************************************************//
     //							變數宣告
     //********************************************************//
@@ -73,7 +81,7 @@ void MpuReader::run()
     int period;
 
     //中位值濾波
-    int MFLen = 5; //濾波器長度為5
+    int MFLen = 5;   //濾波器長度為5
     int **Accls = allcIntDArray(MFLen, 3);
     int **Gyros = allcIntDArray(MFLen, 3);
     int MFCount = 0; // 只用於前五次, 確認filter的data set是不是被裝滿了, 裝滿了才開始濾波
@@ -86,41 +94,41 @@ void MpuReader::run()
     //********************************************************//
     //					連接Com port並確認連線
     //********************************************************//
-#ifdef USE_WIRE_CONNECTION
-    std::cout << "Arduino with GY521 board and chip MPU6050!" << std::endl;
-    char *COM_NUM = "COM5";
-    Serial* SP = new Serial(COM_NUM);    // adjust as needed
-    if (SP->IsConnected())
-        std::cout << "We're connected" << std::endl;
-    //read few set of data until it's getting stable
-    waitUntilSerialStable(SP, incomingData, dataLength);
-
-    std::cout << "Data should be stable, start to read MPU6050" << std::endl;
-#else
-    blue_connector->send("Start to read mpu6050 data from bluetooth.\n");
-#endif
-
-    while(!stop){
-#ifdef USE_WIRE_CONNECTION
-        if(!SP->IsConnected()){
-            std::cout << "Failed to read " << COM_NUM << " Mpu6050 reader is off." << std::endl;
-            emit readingEnded();
-            break;
+    #ifdef USE_WIRE_CONNECTION
+        std::cout << "Arduino with GY521 board and chip MPU6050!" << std::endl;
+        char *COM_NUM = "COM5";
+        Serial* SP = new Serial(COM_NUM);    // adjust as needed
+        if (SP->IsConnected()){
+            emit connectionCreated();
+            std::cout << "We're connected" << std::endl;
+        }else{
+            stopFlag = true;
         }
+        //read few set of data until it's getting stable
+        waitUntilSerialStable(SP, incomingData, dataLength);
 
-        //********************************************************//
-        //	 從Buffer Str取得(accl[3], gyro[3], quatern[4], buttons[2], period)
-        //********************************************************//
-        if( !readSerialIntoBuffer(SP, incomingData, dataLength, readResult, bLen, bSize, buffer) )
-            continue;//If no valid serial data are read or buffer overflow, skip this round
-#else
-        dataLength = blue_connector->receive(incomingData, incomming_buf_len);
-        if(dataLength > 0){//有收到東西
-            incomingData[dataLength] = '\0';
-            strcpy_s(&buffer[bLen], bSize, incomingData);
-            bLen += dataLength;
-        }
-#endif
+        std::cout << "Data should be stable, start to read MPU6050" << std::endl;
+    #else
+        blue_connector->send("Start to read mpu6050 data from bluetooth.\n");
+    #endif
+
+    while(!stopFlag){
+        #ifdef USE_WIRE_CONNECTION
+            if(!SP->IsConnected()){
+                std::cout << "Failed to read " << COM_NUM << " Mpu6050 reader is off." << std::endl;
+                emit readingEnded();
+                break;
+            }
+            if( !readSerialIntoBuffer(SP, incomingData, dataLength, readResult, bLen, bSize, buffer) )
+                continue;//If no valid serial data are read or buffer overflow, skip this round
+        #else
+            dataLength = blue_connector->receive(incomingData, incomming_buf_len);
+            if(dataLength > 0){//有收到東西
+                incomingData[dataLength] = '\0';
+                strcpy_s(&buffer[bLen], bSize, incomingData);
+                bLen += dataLength;
+            }
+        #endif
         //decode mpu6050 data from buffer str, take off processed part from buffer
         strcpy_s(buffer, bSize, getAccelAndGyro(&count, &flag, &bLen, buffer, accl, gyro, quatern, buttons, &period, bSize));
 
@@ -129,7 +137,7 @@ void MpuReader::run()
             continue;//尚未讀到整組完整資料 不處理 繼續讀
 
         SHORT downKeyState = GetAsyncKeyState( VK_DOWN );
-        std::cout << "gravity: " << gravity[0] << ", " << gravity[1] << ", " << gravity[2] << std::endl;
+        //std::cout << "gravity: " << gravity[0] << ", " << gravity[1] << ", " << gravity[2] << std::endl;
         if( writeRawToFile )
         {//按ctrl鍵
             std::cout << "period: " << period << std::endl;
@@ -237,18 +245,14 @@ void MpuReader::setWriteRawToFile(bool value)
 
 
 void MpuReader::stopReading(){
-    stop = true;
+    stopFlag = true;
 }
 void MpuReader::startReading(){
-#ifndef USE_WIRE_CONNECTION
-    blue_connector = new cwz_c_blue();
-    blue_connector->connect();
-#endif
-    stop = false;
+    stopFlag = false;
     this->start();
 }
 bool MpuReader::isReading(){
-    if(stop){
+    if(stopFlag){
         return false;
     }else{
         return true;

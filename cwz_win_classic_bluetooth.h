@@ -21,7 +21,7 @@ private:
     BT_ADDR addr;
 public:
     cwz_c_blue();
-    int connect();
+    int connect(bool &stopFlag);
     inline void send(std::string content);
     inline int  receive(char *buf, int buf_len);
     void disconnect();

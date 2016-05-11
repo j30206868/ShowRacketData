@@ -15,18 +15,20 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     glwidget.cpp \
-    commonfunc.cpp \
     cwz_win_classic_bluetooth.cpp \
     mpu6050reader.cpp \
-    serialclass.cpp
+    serialclass.cpp \
+    commonfunc.cpp \
+    racketdataanalyzer.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
     math_3d.h \
-    commonfunc.h \
     cwz_win_classic_bluetooth.h \
     mpu6050reader.h \
-    serialclass.h
+    serialclass.h \
+    commonfunc.h \
+    racketdataanalyzer.h
 
 FORMS    += mainwindow.ui
 

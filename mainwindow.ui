@@ -136,7 +136,7 @@
      <enum>Qt::ScrollBarAlwaysOff</enum>
     </property>
     <property name="plainText">
-     <string>wu</string>
+     <string/>
     </property>
     <property name="centerOnScroll">
      <bool>false</bool>
@@ -156,6 +156,76 @@
     </property>
     <property name="plainText">
      <string>1</string>
+    </property>
+   </widget>
+   <widget class="QSlider" name="racket_data_idx_slider">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>320</y>
+      <width>121</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="read_file_btn">
+    <property name="geometry">
+     <rect>
+      <x>741</x>
+      <y>250</y>
+      <width>91</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>開始讀檔</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="read_file_name_box">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>290</y>
+      <width>121</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="racket_idx_label">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>340</y>
+      <width>111</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>14</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>0</string>
     </property>
    </widget>
   </widget>

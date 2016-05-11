@@ -30,6 +30,11 @@ private:
     Vector3f origin_z;
     Vector3f new_z;
     float rotate_angle;
+    //camera control
+    float cameraRadius;
+    float cameraAngleInDegree;
+    float cameraX;
+    float cameraY;
 };
 
 #endif // GLWIDGET_H

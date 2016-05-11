@@ -22,6 +22,9 @@ glwidget::glwidget(QWidget *parent) :
     origin_z = Vector3f(0       , 0        , 1);
     new_z    = Vector3f(0.202657, -0.376243, 0.903948);
     init_sin_cos_theta();
+
+    cameraRadius = 10;
+    cameraAngleInDegree = 180;
 }
 
 void glwidget::initializeGL()
@@ -34,8 +37,11 @@ void glwidget::initializeGL()
     //glEnable(GL_LIGHTING);
 }
 
-float RadianToDegree(float radian){
+inline float RadianToDegree(float radian){
     return radian * 57.2958;
+}
+inline float DegreeToRadian(float degree){
+    return degree / 57.2958;
 }
 Vector3f CrossProduct(const Vector3f& v1, const Vector3f& v2)
 {
@@ -72,7 +78,7 @@ void draw_XZ_circle(float r, float bx, float by, float bz){
         y = ny;
         nx = cos_theta[i+1] * r;
         ny = sin_theta[i+1] * r;
-        glColor3f(0, 0, 1.0);
+        glColor3f(0, 0, 1.0);//拍面中心的顏色
         glVertex3f(bx+0.0f, by+0.0f, bz+0.0f);
         glColor3f(1.0f,1.0f,1.0f);
         glVertex3f(bx+x, by, bz+y);
@@ -134,6 +140,37 @@ void glwidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    SHORT leftKeyState  = false;
+    SHORT rightKeyState = false;
+    SHORT downKeyState  = false;
+    SHORT upKeyState    = false;
+
+    bool cameraPosChanged = false;
+    if( ( 1 << 16 ) & leftKeyState ){
+        cameraAngleInDegree += 5;
+        cameraPosChanged = true;
+    }
+    if( ( 1 << 16 ) & rightKeyState ){
+        cameraAngleInDegree -= 5;
+        cameraPosChanged = true;
+    }
+    if( ( 1 << 16 ) & downKeyState ){
+        cameraRadius += 0.5;
+        cameraPosChanged = true;
+    }
+    if( ( 1 << 16 ) & upKeyState ){
+        cameraRadius -= 0.5;
+        cameraPosChanged = true;
+    }
+
+    float radian_angle = DegreeToRadian(cameraAngleInDegree);
+    cameraX      = cameraRadius * sin(radian_angle);
+    cameraY      = cameraRadius * cos(radian_angle);
+
+    if( cameraPosChanged ){
+        std::cout << "CameraCenter(" << cameraX << ", " << cameraY << ") Radius: " << cameraRadius << std::endl;
+    }
+
     //original z
     //origin_z.x = 0;
     //origin_z.y = 0;
@@ -155,15 +192,9 @@ void glwidget::paintGL()
     //std::cout << "rotate_angle: " << rotate_angle << std::endl;
 
     glLoadIdentity();
-    gluLookAt(0, -10, 0, 0, 0, 0, 0, 0, 1);
+    gluLookAt(cameraX, cameraY, -3, 0, 0, 0, 0, 0, 1);
     glRotatef(rotate_angle, rotate_axis.x, rotate_axis.y ,rotate_axis.z);
     glBegin(GL_TRIANGLES);
-        /*glColor3f(1.0, 0, 0);
-        glVertex3f(-0.5, 0, 0 );
-        glColor3f(0, 1.0, 0);
-        glVertex3f( 0.5, 0, 0 );
-        glColor3f(0, 0, 1.0);
-        glVertex3f( origin_z.x, origin_z.y, origin_z.z);*/
         //Sensor部分
         glColor3f(1.0, 0, 0);
         connect_two_XY_circles(0.01, -0.05, 0, -0.15, 0.01, -0.05, 0, 0);
@@ -209,6 +240,6 @@ void glwidget::setNewZ(float x, float y, float z)
 }
 
 void glwidget::mousePressEvent(QMouseEvent *event){
-    std::cout << "release." << std::endl;
+    std::cout << "press." << std::endl;
     updateGL();
 }

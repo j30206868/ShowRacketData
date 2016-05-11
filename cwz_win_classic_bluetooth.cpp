@@ -23,7 +23,7 @@ cwz_c_blue::cwz_c_blue(){
     addr = 0x001209257365;//HC-06
 }
 
-int cwz_c_blue::connect(){
+int cwz_c_blue::connect(bool &stopFlag){
     std::cout << "cwz_c_blue: start to connect bluetooth device ";
     printf("0x%x...", addr);
     std::cout << std::endl;
@@ -52,9 +52,18 @@ int cwz_c_blue::connect(){
     sab.serviceClassId = guid;
     sab.port = 1;
 
-    while(::connect (skt, (SOCKADDR *)&sab, sizeof(sab)) == SOCKET_ERROR){
+    while(::connect (skt, (SOCKADDR *)&sab, sizeof(sab)) == SOCKET_ERROR)
+    {
         std::cout << "cwz_c_blue: bluetooth connection failed, try to connect again after 1 second. error code: " << WSAGetLastError() << std::endl;
+        if(stopFlag){
+            std::cout << "cwz_c_blue: bluetooth connection failed, stopFlag = true." << std::endl;
+            return 0;
+        }
         Sleep(1000);
+        if(stopFlag){
+            std::cout << "cwz_c_blue: bluetooth connection failed, stopFlag = true." << std::endl;
+            return 0;
+        }
     }
     std::cout << "cwz_c_blue: bluetooth socket is successfully connected." << std::endl;
     return 1;

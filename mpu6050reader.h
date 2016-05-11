@@ -2,10 +2,9 @@
 #define COMPORTREADER_H
 
 #include <QThread>
+#include "cwz_win_classic_bluetooth.h"
 #include "serialclass.h"
 #include <string>
-
-#include "cwz_win_classic_bluetooth.h"
 
 #include "glwidget.h"
 
@@ -56,6 +55,7 @@ public:
 signals:
     void updateNewSymbol();//return值 是從main那邊取得下一個檔案的編號
     void readingEnded();
+    void connectionCreated();
 
 protected:
     void run() Q_DECL_OVERRIDE;
@@ -66,7 +66,7 @@ private:
     //QWaitCondition condition;
 
     //private變數
-    bool stop;
+    bool stopFlag;
 
     glwidget *my_glwidget;
 
