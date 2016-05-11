@@ -62,6 +62,7 @@ void RacketDataAnalyzer::stop()
 
 void RacketDataAnalyzer::readNewFile(QString fname)
 {
+    this->stop();
     std::cout << "Read File From: " << this->fpathBox->currentData().toString().toStdString() << std::endl;
     readRacketRawDataFromFile(this->fpathBox->currentData().toString(), this->dataBuf, this->dataAmt);
     std::cout << "Data Count: " << this->dataAmt << std::endl;
