@@ -12,6 +12,12 @@ struct BadData{
     int ms;//period
 };
 
+struct DrawingInfo{
+    BadData *rawBaddata;
+    float gravity[3];
+    bool shouldRackSurfRed;
+};
+
 class RacketDataAnalyzer : public QThread{
     Q_OBJECT
 public:
@@ -21,7 +27,7 @@ public:
 signals:
     updateDataIndexRange(int,int);
     updateDataIndex(int);
-    updateBadData(BadData *data);
+    updateBadData(DrawingInfo *data);
 public slots:
     void readNewFile(QString fname);
     void changeDataIndex(int);
@@ -34,6 +40,7 @@ private:
     int currentIdx;
     BadData *dataBuf;
     bool stopFlag;
+    DrawingInfo *drawInfo;
 };
 
 #endif // RACKETDATAANALYZER

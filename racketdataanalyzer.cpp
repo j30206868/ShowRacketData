@@ -44,6 +44,7 @@ void readRacketRawDataFromFile(QString fileName, BadData *dataBuf, int &bufIdx){
 RacketDataAnalyzer::RacketDataAnalyzer(QObject *parent, QComboBox *_fpathBox)
 {
     dataBuf = new BadData[bufSize];
+    drawInfo = new DrawingInfo();
     fpathBox = _fpathBox;
     stopFlag = true;
     currentIdx = 0;
@@ -76,13 +77,22 @@ void RacketDataAnalyzer::readNewFile(QString fname)
 void RacketDataAnalyzer::changeDataIndex(int idx)
 {
     this->currentIdx = idx;
-    emit updateBadData(&dataBuf[idx]);
+    drawInfo->rawBaddata = &dataBuf[idx];
+    if(currentIdx >= 50 && currentIdx <= 100){
+        drawInfo->shouldRackSurfRed = true;
+    }else{
+        drawInfo->shouldRackSurfRed = false;
+    }
+    emit updateBadData(drawInfo);
 }
 
 static bool surfaceRed = false;
 void RacketDataAnalyzer::run()
 {
     stopFlag = false;
+
+    //emit updateDataIndexRange(1600, 1700);
+
     while(!stopFlag){
         SHORT leftKeyState  = GetAsyncKeyState( VK_LEFT );
         SHORT rightKeyState = GetAsyncKeyState( VK_RIGHT );

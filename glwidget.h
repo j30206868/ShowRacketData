@@ -4,6 +4,7 @@
 #include <QMouseEvent>
 #include <QGLWidget>
 #include <QTimer>
+#include "racketdataanalyzer.h"
 
 #include "math_3d.h"
 
@@ -20,6 +21,8 @@ public:
     void resizeGL(int w, int h);
 
     void setNewZ(float x, float y, float z);
+    void setShouldSurfaceColorRed(bool value);
+
 signals:
 
 public slots:
@@ -35,6 +38,8 @@ private:
     float cameraAngleInDegree;
     float cameraX;
     float cameraY;
+
+    bool shouldSurfaceColorRed;
 };
 
 #endif // GLWIDGET_H

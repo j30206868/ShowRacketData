@@ -69,8 +69,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(mpuReader, SIGNAL(connectionCreated()),
             this, SLOT(mpu6050StartReading()));
 
-    connect(rdAnalyzer, SIGNAL(updateBadData(BadData*)),
-            this, SLOT(changeCurrentBadData(BadData*)));
+    connect(rdAnalyzer, SIGNAL(updateBadData(DrawingInfo *)),
+            this, SLOT(changeCurrentBadData(DrawingInfo *)));
 
     connect(this->rdAnalyzer, SIGNAL(updateDataIndexRange(int,int)),
             ui->racket_data_idx_slider, SLOT(setRange(int,int)));
@@ -127,12 +127,12 @@ void MainWindow::mpu6050StopReading()
     toggleRealTimeGUIEnable(ui, false);
 }
 
-void MainWindow::changeCurrentBadData(BadData *data)
+void MainWindow::changeCurrentBadData(DrawingInfo *dInfo)
 {
-    curBadData = data;
-    float tmp_gravity[3];
-    QtoGravity(curBadData->quaternion, tmp_gravity);
-    ui->widget->setNewZ(tmp_gravity[0], tmp_gravity[1], tmp_gravity[2]);
+    drawInfo = dInfo;
+    QtoGravity(drawInfo->rawBaddata->quaternion, drawInfo->gravity);
+    ui->widget->setNewZ(drawInfo->gravity[0], drawInfo->gravity[1], drawInfo->gravity[2]);
+    ui->widget->setShouldSurfaceColorRed(drawInfo->shouldRackSurfRed);
 }
 
 void MainWindow::on_record_btn_clicked()

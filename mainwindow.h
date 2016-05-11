@@ -22,7 +22,7 @@ private slots:
     void mpu6050StartReading();
     void mpu6050StopReading();
 
-    void changeCurrentBadData(BadData *data);
+    void changeCurrentBadData(DrawingInfo *data);
 
     void on_record_btn_clicked();
 
@@ -37,7 +37,7 @@ private:
     Ui::MainWindow *ui;
     MpuReader *mpuReader;
     RacketDataAnalyzer *rdAnalyzer;
-    BadData *curBadData;
+    DrawingInfo *drawInfo;
 };
 
 #endif // MAINWINDOW_H

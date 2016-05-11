@@ -68,7 +68,7 @@ Vector3f& NormalizeVector(Vector3f& v)
 
     return v;
 }
-void draw_XZ_circle(float r, float bx, float by, float bz){
+void draw_XZ_circle(float r, float bx, float by, float bz, bool shoudSurfaceRed){
     float x, y;
     float nx, ny;
     nx = cos_theta[0] * r;
@@ -78,7 +78,10 @@ void draw_XZ_circle(float r, float bx, float by, float bz){
         y = ny;
         nx = cos_theta[i+1] * r;
         ny = sin_theta[i+1] * r;
-        glColor3f(0, 0, 1.0);//拍面中心的顏色
+        if(shoudSurfaceRed)
+            glColor3f(1.0, 0, 0.0);
+        else
+            glColor3f(0, 0, 1.0);//拍面中心的顏色
         glVertex3f(bx+0.0f, by+0.0f, bz+0.0f);
         glColor3f(1.0f,1.0f,1.0f);
         glVertex3f(bx+x, by, bz+y);
@@ -216,8 +219,7 @@ void glwidget::paintGL()
         connect_two_XY_circles(0.05, 0, 0, 1.2, 0.05, 0, 0, 2.4);
         draw_XY_circle (0.05, 0, 0, 2.4);
         //拍面
-        glColor3f(1.0, 1.0, 1.0);
-        draw_XZ_circle(0.6, 0, 0, 3);
+        draw_XZ_circle(0.6, 0, 0, 3, shouldSurfaceColorRed);
     glEnd();
 }
 
@@ -243,3 +245,8 @@ void glwidget::mousePressEvent(QMouseEvent *event){
     std::cout << "press." << std::endl;
     updateGL();
 }
+void glwidget::setShouldSurfaceColorRed(bool value)
+{
+    shouldSurfaceColorRed = value;
+}
+
