@@ -25,6 +25,8 @@ glwidget::glwidget(QWidget *parent) :
 
     cameraRadius = 10;
     cameraAngleInDegree = 180;
+
+    displace = Vector3f(0,0,0);
 }
 
 void glwidget::initializeGL()
@@ -196,6 +198,7 @@ void glwidget::paintGL()
 
     glLoadIdentity();
     gluLookAt(cameraX, cameraY, -3, 0, 0, 0, 0, 0, 1);
+    glTranslatef(displace.x, displace.y, displace.z);
     glRotatef(rotate_angle, rotate_axis.x, rotate_axis.y ,rotate_axis.z);
     glBegin(GL_TRIANGLES);
         //Sensor部分
@@ -245,6 +248,11 @@ void glwidget::mousePressEvent(QMouseEvent *event){
     std::cout << "press." << std::endl;
     updateGL();
 }
+void glwidget::setDisplace(const Vector3f &value)
+{
+    displace = value;
+}
+
 void glwidget::setShouldSurfaceColorRed(bool value)
 {
     shouldSurfaceColorRed = value;

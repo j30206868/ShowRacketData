@@ -133,6 +133,7 @@ void MainWindow::changeCurrentBadData(DrawingInfo *dInfo)
     QtoGravity(drawInfo->rawBaddata->quaternion, drawInfo->gravity);
     ui->widget->setNewZ(drawInfo->gravity[0], drawInfo->gravity[1], drawInfo->gravity[2]);
     ui->widget->setShouldSurfaceColorRed(drawInfo->shouldRackSurfRed);
+    ui->widget->setDisplace(drawInfo->displace);
 }
 
 void MainWindow::on_record_btn_clicked()

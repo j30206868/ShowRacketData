@@ -175,7 +175,6 @@ void MpuReader::run()
             std::cout << "gravity: " << gravity[0] << "," << gravity[1] << "," << gravity[2] << std::endl;
             std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
             system("PAUSE");
-
         }
 
         //Median Filter(中位值濾波)

@@ -3,7 +3,7 @@
 
 #include <QThread>
 #include <QComboBox>
-
+#include "math_3d.h"
 const int BadDataTotalElement = 11;
 struct BadData{
     int accl[3];
@@ -16,6 +16,7 @@ struct DrawingInfo{
     BadData *rawBaddata;
     float gravity[3];
     bool shouldRackSurfRed;
+    Vector3f displace;
 };
 
 class RacketDataAnalyzer : public QThread{

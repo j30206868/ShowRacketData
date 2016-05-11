@@ -23,6 +23,8 @@ public:
     void setNewZ(float x, float y, float z);
     void setShouldSurfaceColorRed(bool value);
 
+    void setDisplace(const Vector3f &value);
+
 signals:
 
 public slots:
@@ -32,6 +34,7 @@ protected:
 private:
     Vector3f origin_z;
     Vector3f new_z;
+    Vector3f displace;
     float rotate_angle;
     //camera control
     float cameraRadius;
