@@ -137,13 +137,12 @@ void MpuReader::run()
         //   每一組合法數值為 (acclX,acclY,acclZ,gyroX,gyroY,gyroZ,quatern1,quatern2,quatern3,quatern4,buttonRight,buttonLeft,readperiod)
         if( flag != GETAANDG_NEW_VALID_DATA )
             continue;//尚未讀到整組完整資料 不處理 繼續讀
-
+        cwz_timer::start();
         SHORT downKeyState = GetAsyncKeyState( VK_DOWN );
         //std::cout << "gravity: " << gravity[0] << ", " << gravity[1] << ", " << gravity[2] << std::endl;
+        //std::cout << "period: " << period << std::endl;
         if( writeRawToFile )
-        {//按ctrl鍵
-            std::cout << "period: " << period << std::endl;
-
+        {
             if( ( 1 << 16 ) & downKeyState ){
                 //writeAcclAndGyroAndGravity(fileNameSStream.str().c_str(), accl, gyro, gravity, 1);
                 writeMpu6050RawToFile(fileNameSStream.str().c_str(), accl, gyro, quatern, period, 1);
@@ -164,19 +163,19 @@ void MpuReader::run()
         //去重力
         removeGravity(accl, gravity);
 
-        v.x = (float)accl[0] / 327680 * period;
-        v.y = (float)accl[1] / 327680 * period;
-        v.z = (float)accl[2] / 327680 * period;
+        //v.x = (float)accl[0] / 327680 * period;
+        //v.y = (float)accl[1] / 327680 * period;
+        //v.z = (float)accl[2] / 327680 * period;
 
-        disp += v;
+        //disp += v;
 
         this->my_glwidget->setNewZ(gravity[0], gravity[1], gravity[2]);
-        this->my_glwidget->setDisplace(disp);
+        //this->my_glwidget->setDisplace(disp);
 
-        SHORT spaceKeyState = GetAsyncKeyState(VK_SPACE);
+        /*SHORT spaceKeyState = GetAsyncKeyState(VK_SPACE);
         if( ( 1 << 16 ) & spaceKeyState){
             disp = Vector3f(0,0,0);
-        }
+        }*/
 
         double total_q = sqrt(gravity[0]*gravity[0] + gravity[1]*gravity[1] + gravity[2]*gravity[2]);
         //check if gravity value is invalid
@@ -191,7 +190,8 @@ void MpuReader::run()
         }
 
         //Median Filter(中位值濾波)
-        agMedianFilter(Accls, Gyros, accl, gyro, MFCount, MFLen, true, true); //是否做濾波 accl=true gyro=true
+        //agMedianFilter(Accls, Gyros, accl, gyro, MFCount, MFLen, true, true); //是否做濾波 accl=true gyro=true
+        cwz_timer::time_display("loop time consumption: ");
     }
 #ifdef USE_WIRE_CONNECTION
     SP->~Serial();

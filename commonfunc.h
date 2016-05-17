@@ -13,6 +13,21 @@ struct dualIntArray{
     intArray B;
 };
 
+class cwz_timer{
+public:
+    static void start();
+    static void t_start();
+    static double stop();
+    static double t_stop();
+    static void time_display(char *disp,int nr_frame=1);
+    static void t_time_display(char *disp,int nr_frame=1);
+private:
+    static double m_pc_frequency;
+    static __int64 m_counter_start;
+    static double t_pc_frequency;
+    static __int64 t_counter_start;
+};
+
 //IntArray處理
 void cleanIntA(intArray &data);
 intArray copyIntA(intArray data);
