@@ -4,7 +4,6 @@
 //#include "mousectrl.h"
 #include <iostream>
 #include <QString>
-#include <fstream>
 #include <sstream>
 #include <ctime>
 
@@ -41,6 +40,7 @@ MpuReader::MpuReader(QObject *parent)
 MpuReader::~MpuReader()
 {
     stopFlag = true;
+    this->myfile.close();
     wait();//使執行緒在Stop被改為true時 會等到run那邊的迴圈結束才把執行緒destory掉
            //避免不可預期之錯誤發生
 }
@@ -145,11 +145,11 @@ void MpuReader::run()
         {
             if( ( 1 << 16 ) & downKeyState ){
                 //writeAcclAndGyroAndGravity(fileNameSStream.str().c_str(), accl, gyro, gravity, 1);
-                writeMpu6050RawToFile(fileNameSStream.str().c_str(), accl, gyro, quatern, period, 1);
+                writeMpu6050RawToFile(this->myfile, accl, gyro, quatern, period, 1);
                 //std::cout << "Down Key State: " << 1 << std::endl;
             }else{
                 //writeAcclAndGyroAndGravity(fileNameSStream.str().c_str(), accl, gyro, gravity, 0);
-                writeMpu6050RawToFile(fileNameSStream.str().c_str(), accl, gyro, quatern, period, 0);
+                writeMpu6050RawToFile(this->myfile, accl, gyro, quatern, period, 0);
                 //std::cout << "Down Key State: " << 0 << std::endl;
             }
         }
@@ -243,6 +243,8 @@ void MpuReader::setWriteRawToFile(bool value)
         fileNameSStream.str("");
         fileNameSStream << racketFilePath << date_string << "_" << type_string << "_" << person_string << "_" << racket_file_count << ".txt";
         cleanFile(fileNameSStream.str());
+        this->myfile.close();
+        this->myfile.open(fileNameSStream.str().c_str());
         std::cout << std::endl << std::endl << std::endl << std::endl << std::endl;
         std::cout << std::endl << std::endl << std::endl << std::endl << std::endl;
         std::cout << "====> Start New File: " << fileNameSStream.str() << std::endl;
@@ -666,12 +668,11 @@ void writeAcclAndGyroAndGravity(const char *fname, int *accl, int *gyro, float *
     myfile.close();
 }
 
-void writeMpu6050RawToFile(const char *fname, int *accl, int *gyro, float *quaternion, int period, int isDownKeyPressed){
-    std::ofstream myfile (fname, std::ios::app);
+void writeMpu6050RawToFile(std::ofstream &myfile, int *accl, int *gyro, float *quaternion, int period, int isDownKeyPressed){
     myfile << accl[0] << "," << accl[1] << "," << accl[2] << ",";
     myfile << gyro[0] << "," << gyro[1] << "," << gyro[2] << ",";
     myfile << quaternion[0] << "," << quaternion[1] << "," << quaternion[2] <<"," << quaternion[3] << ",";
     myfile << period << ",";
     myfile << isDownKeyPressed << "\n";
-    myfile.close();
+    //myfile.close();
 }

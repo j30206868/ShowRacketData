@@ -6,6 +6,8 @@
 #include "serialclass.h"
 #include <string>
 
+#include <fstream>
+
 #include "glwidget.h"
 
 //全域變數宣告
@@ -24,7 +26,7 @@ void waitUntilSerialStable(Serial* SP, char *incomingData, int dataLength);
 int readSerialIntoBuffer(Serial* SP, char *incomingData, int &dataLength, int &readResult, int &bLen, int bSize, char *buffer);
 
 void writeAcclAndGyroAndGravity(const char *fname, int *accl, int *gyro, float *gravity, int isDownKeyPressed);
-void writeMpu6050RawToFile(const char *fname, int *accl, int *gyro, float *quaternion, int period, int isDownKeyPressed);
+void writeMpu6050RawToFile(std::ofstream &myfile, int *accl, int *gyro, float *quaternion, int period, int isDownKeyPressed);
 
 class MpuReader : public QThread
 {
@@ -74,6 +76,8 @@ private:
     std::string person_string;
     int racket_file_count;
     bool writeRawToFile;
+
+    std::ofstream myfile;
 };
 
 #endif // COMPORTREADER_H

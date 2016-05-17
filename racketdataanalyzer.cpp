@@ -55,6 +55,8 @@ RacketDataAnalyzer::~RacketDataAnalyzer()
 {
     stopFlag = true;
     delete[] dataBuf;
+    wait();//使執行緒在Stop被改為true時 會等到run那邊的迴圈結束才把執行緒destory掉
+           //避免不可預期之錯誤發生
 }
 
 void RacketDataAnalyzer::stop()
